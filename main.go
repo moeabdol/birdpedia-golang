@@ -1,16 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/moeabdol/birdpedia-golang/controllers"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, World!")
-}
-
 func main() {
-	http.HandleFunc("/", handler)
-
-	http.ListenAndServe(":8080", nil)
+	r := mux.NewRouter()
+	r.HandleFunc("/", controllers.GetHome).Methods(http.MethodGet)
+	http.ListenAndServe(":8080", r)
 }
