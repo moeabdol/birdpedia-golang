@@ -42,3 +42,14 @@ func (store *Store) CreateBird(ctx context.Context, arg CreateBirdParams) (Bird,
 	)
 	return bird, err
 }
+
+const deleteBirdQuery = `
+DELETE FROM birds
+WHERE ID = $1;
+`
+
+// DeleteBird function
+func (store *Store) DeleteBird(ctx context.Context, id int64) error {
+	_, err := store.dbtx.ExecContext(context.Background(), deleteBirdQuery, id)
+	return err
+}

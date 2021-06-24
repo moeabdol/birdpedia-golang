@@ -40,8 +40,8 @@ func (store *Store) execTx(ctx context.Context, fn func(*Store) error) error {
 		return err
 	}
 
-	q := New(tx)
-	err = fn(q)
+	s := New(tx)
+	err = fn(s)
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
 			return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
