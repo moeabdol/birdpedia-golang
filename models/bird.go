@@ -53,3 +53,72 @@ func (store *Store) DeleteBird(ctx context.Context, id int64) error {
 	_, err := store.dbtx.ExecContext(context.Background(), deleteBirdQuery, id)
 	return err
 }
+
+const getBirdQuery = `
+SELECT id, species, description, created_at, updated_at
+FROM birds
+WHERE id = $1
+LIMIT 1;
+`
+
+// GetBird function
+func (store *Store) GetBird(ctx context.Context, id int64) (Bird, error) {
+	row := store.dbtx.QueryRowContext(ctx, getBirdQuery, id)
+	var bird Bird
+	err := row.Scan(
+		&bird.ID,
+		&bird.Species,
+		&bird.Description,
+		&bird.CreatedAt,
+		&bird.UpdatedAt,
+	)
+	return bird, err
+}
+
+const listBirdsQuery = `
+SELECT id, species, description, created_at, updated_at
+FROM birds
+ORDER BY id
+LIMIT $1
+OFFSET $2;
+`
+
+// ListBirdsParams type
+type ListBirdsParams struct {
+	Limit  int64 `json:"limit"`
+	Offset int64 `json:"offset"`
+}
+
+// ListBirds function
+func (store *Store) ListBirds(ctx context.Context, arg ListBirdsParams) ([]Bird, error) {
+	rows, err := store.dbtx.QueryContext(ctx, listBirdsQuery, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var birds []Bird
+	for rows.Next() {
+		var bird Bird
+		if err := rows.Scan(
+			&bird.ID,
+			&bird.Species,
+			&bird.Description,
+			&bird.CreatedAt,
+			&bird.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		birds = append(birds, bird)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return birds, nil
+}
