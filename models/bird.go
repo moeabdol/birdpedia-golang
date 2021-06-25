@@ -122,3 +122,30 @@ func (store *Store) ListBirds(ctx context.Context, arg ListBirdsParams) ([]Bird,
 
 	return birds, nil
 }
+
+const updateBirdQuery = `
+UPDATE birds
+SET description = $2, updated_at = now()
+WHERE id = $1
+RETURNING id, species, description, created_at, updated_at;
+`
+
+// UpdateBirdParams type
+type UpdateBirdParams struct {
+	ID          int64  `json:"id"`
+	Description string `json:"description"`
+}
+
+// UpdateBird function
+func (store *Store) UpdateBird(ctx context.Context, arg UpdateBirdParams) (Bird, error) {
+	row := store.dbtx.QueryRowContext(ctx, updateBirdQuery, arg.ID, arg.Description)
+	var bird Bird
+	err := row.Scan(
+		&bird.ID,
+		&bird.Species,
+		&bird.Description,
+		&bird.CreatedAt,
+		&bird.UpdatedAt,
+	)
+	return bird, err
+}

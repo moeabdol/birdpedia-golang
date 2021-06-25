@@ -101,3 +101,23 @@ func TestListBirds(t *testing.T) {
 		deleteTestBird(t, bird)
 	}
 }
+
+func TestUpdateBird(t *testing.T) {
+	bird1 := createTestBird(t)
+
+	arg := UpdateBirdParams{
+		ID:          bird1.ID,
+		Description: utils.RandomString(20),
+	}
+
+	bird2, err := testStore.UpdateBird(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, bird2)
+	require.Equal(t, bird1.ID, bird2.ID)
+	require.Equal(t, bird1.Species, bird2.Species)
+	require.NotEqual(t, bird1.Description, bird2.Description)
+	require.Equal(t, bird1.CreatedAt, bird2.CreatedAt)
+	require.NotEqual(t, bird1.UpdatedAt, bird2.UpdatedAt)
+
+	deleteTestBird(t, bird2)
+}
