@@ -1,28 +1,15 @@
 package models
 
 import (
-	"database/sql"
-	"log"
 	"os"
 	"testing"
 
-	_ "github.com/lib/pq"
-)
-
-var testStore *Store
-
-const (
-	dbDriver = "postgres"
-	dbSource = "postgres://postgres:postgres@localhost:5432/birds_test_db?sslmode=disable"
+	"github.com/moeabdol/birdpedia-golang/utils"
 )
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
-	if err != nil {
-		log.Fatal("Cannot connect to database")
-	}
-
-	testStore = New(conn)
+	utils.LoadConfig()
+	ConnectDatabase()
 
 	os.Exit(m.Run())
 }

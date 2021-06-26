@@ -15,7 +15,7 @@ func createTestBird(t *testing.T) Bird {
 		Description: utils.RandomString(20),
 	}
 
-	bird, err := testStore.CreateBird(context.Background(), arg)
+	bird, err := store.CreateBird(context.Background(), arg)
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +24,7 @@ func createTestBird(t *testing.T) Bird {
 }
 
 func deleteTestBird(t *testing.T, bird Bird) {
-	err := testStore.DeleteBird(context.Background(), bird.ID)
+	err := store.DeleteBird(context.Background(), bird.ID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,7 +36,7 @@ func TestCreateBird(t *testing.T) {
 		Description: "The bald eagle is a bird of prey found in North America.",
 	}
 
-	bird, err := testStore.CreateBird(context.Background(), arg)
+	bird, err := store.CreateBird(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, bird)
 	require.Equal(t, bird.Species, arg.Species)
@@ -50,10 +50,10 @@ func TestCreateBird(t *testing.T) {
 func TestDeleteBird(t *testing.T) {
 	bird := createTestBird(t)
 
-	err := testStore.DeleteBird(context.Background(), bird.ID)
+	err := store.DeleteBird(context.Background(), bird.ID)
 	require.NoError(t, err)
 
-	bird, err = testStore.GetBird(context.Background(), bird.ID)
+	bird, err = store.GetBird(context.Background(), bird.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, bird)
@@ -62,7 +62,7 @@ func TestDeleteBird(t *testing.T) {
 func TestGetBird(t *testing.T) {
 	bird1 := createTestBird(t)
 
-	bird2, err := testStore.GetBird(context.Background(), bird1.ID)
+	bird2, err := store.GetBird(context.Background(), bird1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, bird2)
 	require.Equal(t, bird1.ID, bird2.ID)
@@ -85,7 +85,7 @@ func TestListBirds(t *testing.T) {
 		Offset: 0,
 	}
 
-	birds, err := testStore.ListBirds(context.Background(), arg)
+	birds, err := store.ListBirds(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, birds)
 	require.Len(t, birds, n)
@@ -110,7 +110,7 @@ func TestUpdateBird(t *testing.T) {
 		Description: utils.RandomString(20),
 	}
 
-	bird2, err := testStore.UpdateBird(context.Background(), arg)
+	bird2, err := store.UpdateBird(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, bird2)
 	require.Equal(t, bird1.ID, bird2.ID)

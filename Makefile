@@ -35,6 +35,6 @@ clean:
 	go clean -cache
 
 test:
-	go test -v -cover ./...
+	ENV=test go test -v -cover ./...
 
 .PHONY: postgres start_db stop_db create_db drop_db create_test_db drop_test_db migrate_up migrate_down migrate_test_up migrate_test_down clean test
